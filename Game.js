@@ -70,7 +70,7 @@ function mergeGameState(existingSave, newState) {
 }
 
 function menu() {
-  rl.question('[System] What would you like to do next?\n1: Load Game\n2: Start New Game\n3: Exit\n', (action) => {
+  rl.question('[System] What would you like to do next ?\n1: Load Game\n2: Start New Game\n3: Exit\n\n', (action) => {
     switch (action) {
       case '1':
         loadGame();
@@ -80,7 +80,7 @@ function menu() {
         break;
       case '3':
         rl.close();
-        console.log('[System] See you later !');
+        console.log('\n[System] See you later !');
         break;
       default:
         console.log('[System] Invalid option, please try again.');
@@ -161,7 +161,7 @@ function loadGame() {
     player.name = savedGame.JohnemonMaster.name;
     player.johnemonCollection = savedGame.JohnemonMaster.johnemonCollection;
     setTimeout(() => {
-      console.log(`[System] Game loaded successfully. Welcome back, ${player.name}!`);
+      console.log(`[System] Game loaded successfully. Welcome back, ${player.name} !`);
       menu();
     }, 2000);
   } else {
