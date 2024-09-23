@@ -95,7 +95,10 @@ function askForName() {
     player.name = answer;
     currentGameState.JohnemonMaster.name = answer;
     console.log(`[Professor RaveChoux] Great welcome in Johnemon's world, ${answer}.`);
-    proposeFirstJohnemon();
+
+    setTimeout(() => {
+      proposeFirstJohnemon();
+    }, 1000);
   });
 }
 
@@ -105,7 +108,10 @@ function proposeFirstJohnemon() {
   let thirdJohnemon = johnemon.generateRandomName();
 
   rl.question(`[Professor RaveChoux] Who will be your first lovely companion (${firstJohnemon} - ${secondJohnemon} - ${thirdJohnemon})?\n`, (answer) => {
-    console.log(`\n[Professor RaveChoux] Great choice, ${answer} is happy to be your new friend ! Let's begin a new adventure !\n\n[System] Saving in progress . . .`);
+    setTimeout(() => {
+      console.log(`\n[Professor RaveChoux] Great choice, ${answer} is happy to be your new friend !\n\n[System] Saving in progress . . .`);
+    }, 1000);
+
     player.johnemonCollection.push(answer);
     currentGameState.JohnemonMaster.johnemonCollection.push({
       "name": answer,
@@ -115,7 +121,9 @@ function proposeFirstJohnemon() {
       "healthPool": johnemon.healthPool,
       "catchPhrase": johnemon.catchPhrase
     });
-    saveGameState();
+    setTimeout(() => {
+      saveGameState();
+    }, 2000);
   });
 }
 
@@ -177,48 +185,3 @@ function main() {
 }
 
 main();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
