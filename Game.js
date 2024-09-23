@@ -40,7 +40,7 @@ function saveGameState() {
       if (error) {
         console.error(error.message);
       } else {
-        console.log("Game updated successfully.");
+        console.log("[System] Game updated successfully.");
         menu();
       }
     });
@@ -49,7 +49,7 @@ function saveGameState() {
       if (error) {
         console.error(error.message);
       } else {
-        console.log("Game saved successfully.");
+        console.log("[System] Game saved successfully.");
         menu();
       }
     });
@@ -70,7 +70,7 @@ function mergeGameState(existingSave, newState) {
 }
 
 function menu() {
-  rl.question('What would you like to do next?\n1: Load Game\n2: Start New Game\n3: Exit\n', (action) => {
+  rl.question('[System] What would you like to do next?\n1: Load Game\n2: Start New Game\n3: Exit\n', (action) => {
     switch (action) {
       case '1':
         loadGame();
@@ -80,10 +80,10 @@ function menu() {
         break;
       case '3':
         rl.close();
-        console.log('See you later !');
+        console.log('[System] See you later !');
         break;
       default:
-        console.log('Invalid option, please try again.');
+        console.log('[System] Invalid option, please try again.');
         menu();
         break;
     }
@@ -91,10 +91,10 @@ function menu() {
 }
 
 function askForName() {
-  rl.question('How should I call our future new arena champion?\n', (answer) => {
+  rl.question('[Professor RaveChoux] How should I call our future new arena champion?\n', (answer) => {
     player.name = answer;
     currentGameState.JohnemonMaster.name = answer;
-    console.log(`Great welcome in Johnemon's world, ${answer}.`);
+    console.log(`[Professor RaveChoux] Great welcome in Johnemon's world, ${answer}.`);
     proposeFirstJohnemon();
   });
 }
@@ -104,8 +104,8 @@ function proposeFirstJohnemon() {
   let secondJohnemon = johnemon.generateRandomName();
   let thirdJohnemon = johnemon.generateRandomName();
 
-  rl.question(`Who will be your first lovely companion (${firstJohnemon} - ${secondJohnemon} - ${thirdJohnemon})?\n`, (answer) => {
-    console.log(`\nGreat choice, ${answer} is happy to be your new friend! Let's begin a new adventure!\n\nSaving in progress . . .`);
+  rl.question(`[Professor RaveChoux] Who will be your first lovely companion (${firstJohnemon} - ${secondJohnemon} - ${thirdJohnemon})?\n`, (answer) => {
+    console.log(`\n[Professor RaveChoux] Great choice, ${answer} is happy to be your new friend ! Let's begin a new adventure !\n\n[System] Saving in progress . . .`);
     player.johnemonCollection.push(answer);
     currentGameState.JohnemonMaster.johnemonCollection.push({
       "name": answer,
@@ -120,26 +120,55 @@ function proposeFirstJohnemon() {
 }
 
 function newGame() {
-  console.log("Blabla de bienvenue !");
-  askForName();
+  console.log("[System] Creating new game . . .\n");
+
+  setTimeout(() => {
+    console.log("[Professor RaveChoux] Hello there! Glad to meet you !");
+  },2000);
+
+  setTimeout(() => {
+    console.log("[Professor RaveChoux] Welcome to the world of Johnemon! My name is Professor RaveChoux.");
+  },4000);
+
+  setTimeout(() => {
+    console.log("[Professor RaveChoux] This world is inhabited far and wide by creatures called Johnemon.");
+  },6000);
+
+  setTimeout(() => {
+    console.log("[Professor RaveChoux] For some people, Johnemon are pets. Others use them for battles.");
+  },8000);
+
+  setTimeout(() => {
+    console.log("[Professor RaveChoux] As for myself... I study Johnemon as a profession.");
+  },10000);
+
+  setTimeout(() => {
+    console.log("[Professor RaveChoux] But enough about me, I'd like to know more about you.");
+  },12000);
+
+  setTimeout(() => {
+    askForName();
+  }, 14000);
 }
 
 function loadGame() {
   const saveFilePath = 'save_game.json';
 
   if (fs.existsSync(saveFilePath)) {
-    console.log("Loading existing game...");
+    console.log("[System] Loading existing game...");
     const savedGame = JSON.parse(fs.readFileSync(saveFilePath, 'utf8'));
     mergeGameState(currentGameState, savedGame);
     player.name = savedGame.JohnemonMaster.name;
     player.johnemonCollection = savedGame.JohnemonMaster.johnemonCollection;
     setTimeout(() => {
-      console.log(`Game loaded successfully. Welcome back, ${player.name}!`);
+      console.log(`[System] Game loaded successfully. Welcome back, ${player.name}!`);
       menu();
     }, 2000);
   } else {
-    console.log("No previous game found, let's begin a new adventure !");
-    newGame();
+    console.log("[System] No previous game found, let's begin a new adventure !");
+    setTimeout(() => {
+      newGame();
+    },2000);
   }
 }
 
@@ -148,3 +177,48 @@ function main() {
 }
 
 main();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
