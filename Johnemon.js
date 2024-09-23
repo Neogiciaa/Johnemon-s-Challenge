@@ -79,23 +79,34 @@ class Johnemon {
   }
 
   attack(defender) {
-
+    const damage = this.getRandomNumber(this.attackRange * this.level, this.attackRange) - defender.defenseRange;
+    defender.healthPool -= damage;
+    console.log(`${this.name} attacked ${defender.name} and dealt ${damage} damage!`);
   }
 
   gainExperience(opponentLevel) {
-
+    const experienceGain = this.getRandomNumber(1, 5) * opponentLevel;
+    this.experienceMeter += experienceGain;
+    console.log(`${this.name} gained ${experienceGain} experience points!`);
+    if (this.experienceMeter >= this.level * 100) {
+      this.evolve();
+    }
   }
 
   evolve() {
-
+    this.level += 1;
+    const attackIncrease = this.getRandomNumber(1, 5);
+    const defenseIncrease = this.getRandomNumber(1, 5);
+    const healthIncrease = this.getRandomNumber(1, 5);
+    this.attackRange += attackIncrease;
+    this.defenseRange += defenseIncrease;
+    this.healthPool += healthIncrease;
+    console.log(`${this.name} evolved into a higher level! New stats: Level ${this.level}, Attack Range ${this.attackRange}, Defense Range ${this.defenseRange}, Health Pool ${this.healthPool}`);
   }
 
   sayCatchPhrase() {
-
+    console.log(`${this.name} says: "${this.catchPhrase}"`);
   }
 }
 
-let pokemon = new Johnemon();
-console.log(pokemon.generateRandomName());
-
-module.exports = Johnemon;
+module.exports = Johnemon
