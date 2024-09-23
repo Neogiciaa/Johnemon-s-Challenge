@@ -26,30 +26,30 @@ const firstStudentsPart = [
 ]
 
 const secondStudentsPart = [
-  'via',
-  'ra',
-  'na',
-  'hab',
-  'ne',
-  'stien',
-  'elle',
-  'id',
-  'ien',
-  'ias',
-  'amin',
-  'teo',
-  'da',
-  'tien',
-  'aud',
-  'ine',
-  'anne',
-  'hen',
-  'med',
-  'kim',
-  'rre',
-  'go',
-  'éo',
-  'me',
+  'viaon',
+  'raon',
+  'naon',
+  'habon',
+  'neon',
+  'stienon',
+  'elleon',
+  'idon',
+  'ienon',
+  'iason',
+  'aminon',
+  'teoon',
+  'daon',
+  'tienon',
+  'audon',
+  'ineon',
+  'anneon',
+  'henon',
+  'medon',
+  'kimon',
+  'rreon',
+  'goon',
+  'éoon',
+  'meon',
 ]
 
 class Johnemon {
@@ -94,5 +94,8 @@ class Johnemon {
 
   }
 }
+
+let pokemon = new Johnemon();
+console.log(pokemon.generateRandomName());
 
 module.exports = Johnemon;
