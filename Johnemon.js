@@ -54,6 +54,7 @@ const secondStudentsPart = [
 
 class Johnemon {
   constructor() {
+    this.id = 0;
     this.name = this.generateRandomName();
     this.level = 1;
     this.experienceMeter = 0;
@@ -109,4 +110,4 @@ class Johnemon {
   }
 }
 
-module.exports = Johnemon
+module.exports = Johnemon;

@@ -1,0 +1,21 @@
+{
+  "saved_on": 1727190329841,
+  "JohnemonMaster": {
+    "name": "Neo",
+    "johnemonCollection": [
+      {
+        "name": "Cedo",
+        "level": 1,
+        "attackRange": 8,
+        "defenseRange": 3,
+        "healthPool": 12,
+        "catchPhrase": "Let's fight together !"
+      }
+    ],
+    "healingItems": 0,
+    "reviveItems": 0,
+    "JOHNEBALLS": 0
+  },
+  "day": 1,
+  "logs": []
+}

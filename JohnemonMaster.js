@@ -3,34 +3,32 @@ class JohnemonMaster {
   constructor(name) {
     this.name = name;
     this.johnemonCollection = [];
-    this.healingItems = 5; // Initial number of healing items
-    this.reviveItems = 3; // Initial number of revive items
-    this.JOHNEBALLS = 10; // Initial number of JOHNEBALLS
+    this.healingItems = 5;
+    this.reviveItems = 3;
+    this.JOHNEBALLS = 10;
+    this.success = [];
   }
 
-
-  renameJohnemon(johnemon) {
-    
+  renameJohnemon(johnemon, newName) {
+    console.log("RENAME")
   }
 
-
-
-  healJohnemon(johnemon) {
-    
+  healJohnemon(previousHealthPool) {
+    console.log("HEAL")
   }
 
-  reviveJohnemon(johnemon) {
-    
+  reviveJohnemon(player, johnemon) {
+    //  johnemon.healthPool = Pv de base ??
+      player.reviveHealingItems -= 1;
   }
-
 
   releaseJohnemon(johnemon) {
-    
+    console.log("RELEASE")
   }
 
   showCollection() {
-    
+
   }
 }
 
-module.exports = JohnemonMaster
+module.exports = JohnemonMaster;

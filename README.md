@@ -90,11 +90,11 @@ https://github.com/Junior-dev-Track/10-01-Javascript-recap-Johnemon/assets/18058
 
 After that the game will start, but before, let's create a save state so that we can quit and load the game.
 
-## Part Four the **Save.json** file
+## Part Four the **SaveMap.json** file
 
-We will generate a save.json file that will contain ourr data for each step of the way.
+We will generate a saveMap.json file that will contain ourr data for each step of the way.
 
-After the User chooses his first JOHNEMON™, the game will save the state in the save.json file.
+After the User chooses his first JOHNEMON™, the game will save the state in the saveMap.json file.
 
 under the following format:
 ```json
@@ -138,12 +138,12 @@ https://github.com/Junior-dev-Track/10-01-Javascript-recap-Johnemon/assets/18058
 When starting a new game by running the command
 
 ```bash
-node Game.js
+node GameMap.js
 ```
 
 We want to be sure to be offered the possibility of loading a previous game.
-If there is a save.json file, the game should ask the user if he wants to load it.
-if the user says yes, the game should load the save.json file and start from where the user left off.
+If there is a saveMap.json file, the game should ask the user if he wants to load it.
+if the user says yes, the game should load the saveMap.json file and start from where the user left off.
 if the user says no, the game should start from the beginning.
 
 

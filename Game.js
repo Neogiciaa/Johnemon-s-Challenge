@@ -41,7 +41,7 @@ function saveGameState() {
         console.error(error.message);
       } else {
         console.log("[System] Game updated successfully.");
-        mainMenu();
+        inGameMenu();
       }
     });
   } else {
@@ -50,7 +50,7 @@ function saveGameState() {
         console.error(error.message);
       } else {
         console.log("[System] Game saved successfully.");
-        mainMenu();
+        inGameMenu();
       }
     });
   }
@@ -132,14 +132,16 @@ function askQuestion(tryLeft) {
 }
 
 function mainMenu() {
-  rl.question('[System] What would you like to do next ?\n1: Load Game\n2: Start New Game\n3: Exit\n\n', (action) => {
+  rl.question('', (action) => {
     readline.moveCursor(process.stdout, 0, -1);
     readline.clearLine(process.stdout, 0);
     switch (action) {
-      case '1': loadGame();
-      break;
-      case '2': newGame();
-      break;
+      case '1':
+        loadGame();
+        break;
+      case '2':
+        newGame();
+        break;
       case '3':
         rl.close();
         console.log('\n[System] See you later !');
@@ -147,6 +149,71 @@ function mainMenu() {
       default:
         console.log('[System] Invalid option, please try again.');
         mainMenu();
+        break;
+    }
+  });
+}
+
+function quitGame() {
+  console.log('\n[System] See you later !');
+  rl.close();
+}
+
+function fight() {
+  let ennemy = new Johnemon();
+}
+
+function showCollection() {
+  console.log("Here's your collection :");
+  player.johnemonCollection.forEach((johnemon) => {
+    console.log(`${johnemon.id}: Name: ${johnemon.name} - Level: ${johnemon.level} - Attack: ${johnemon.attackRange} - Defense: ${johnemon.defenseRange} - HP: ${johnemon.healthPool}`);
+
+    rl.question('Select a johnemon to perform an action ? ', (answer) => {
+      let selectedJohnemon = player.johnemonCollection[answer -1];
+      rl.question(`You selected ${selectedJohnemon.name}, what do you want to do then ? \n1: Heal \n2: Revive \n3: Rename \n4: Release \n5: Return to menu  `, (answer) => {
+        switch (answer) {
+          case '1':
+            player.healJohnemon(selectedJohnemon);
+            break;
+          case '2':
+            player.reviveJohnemon(selectedJohnemon);
+            break;
+          case '3':
+            player.renameJohnemon(selectedJohnemon);
+            break;
+          case '4':
+            player.releaseJohnemon(selectedJohnemon);
+            break;
+          case '5':
+            inGameMenu();
+            break;
+        }
+      })
+    })
+  }, 1000);
+
+}
+
+function inGameMenu() {
+  rl.question("[System] What would you like to do next ?\n1: Continue exploration \n2: Collection \n3: Sleep \n4: Save game \n5: Return to main menu\n", (action) => {
+    readline.moveCursor(process.stdout, 0, -1);
+    readline.clearLine(process.stdout, 0);
+    switch (action) {
+      case '1': // fight(); OneDayPass ??
+        break;
+      case '2':
+        showCollection();
+        break;
+      case '3': // sleep();
+        break;
+      case '4': saveGameState();
+        break;
+      case '5':
+        quitGame();
+        break;
+      default:
+        console.log('[System] Invalid option, please try again.');
+        inGameMenu();
         break;
     }
   });
@@ -251,8 +318,8 @@ function loadGame() {
     player.johnemonCollection = savedGame.JohnemonMaster.johnemonCollection;
     setTimeout(() => {
       console.log(`[System] Game loaded successfully. Welcome back, ${player.name} !`);
-      console.log(`[System] Player ${player.name} joined "Pallet Town."`)
-      mainMenu();
+      console.log(`[System] Player ${player.name} joined Pallet Town.`) // @todo ref: world.currentMap
+      inGameMenu();
     }, 2000);
   } else {
     console.log("[System] No previous game found, let's begin a new adventure !");

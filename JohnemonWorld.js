@@ -1,24 +1,23 @@
-const JohnemonArena = require('./JohnemonArena')
-const Johnemon = require('./Johnemon')
-
-
 class JohnemonWorld {
   constructor() {
-   
+    this.currentMap = {
+      name: "Pallet Town",
+      ennemies: [],
+    }
+    this.maps = [];
   }
 
-  oneDayPasses(){
-    
+  oneDayPasses(johnemon) {
+
   }
-  
+
   randomizeEvent() {
-     
+
   }
 
-  addLog(newLog){
-    
+  addLog(player, newLog) {
+
   }
 }
-
 
 module.exports = JohnemonWorld
