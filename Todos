@@ -1,0 +1,18 @@
+Day 3 --
+
+## Todo
+- Refacto menu d'actions sur Johnemons dans la collection (Rename & release)
+- Terminer la gestion de maps et modifier ligne 162 de Game.js pour rendre dynamique la map actuelle du joueur.
+- Fonctions de combat.
+- Créer une fonction de log messages.
+
+## Debug
+- Quand je crées une new partie, le premier Pokémon n'es pas accessible dans la collection, je dois relancer le jeu.
+- MainMenu pas call
+
+## Refacto
+- Changer mon système de naming de pokemon éclatax atm. Done
+- Modifier ma sélection de premier pokémon. Done
+- Fonctions pour gérer un pokémon (soin etc). In progress
+- Créer une fonction de parseInt.
+- setTimeOut partout beurk.
