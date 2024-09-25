@@ -60,7 +60,8 @@ class Johnemon {
     this.experienceMeter = 0;
     this.attackRange = this.getRandomNumber(1, 8);
     this.defenseRange = this.getRandomNumber(1, 3);
-    this.healthPool = this.getRandomNumber(10, 30);
+    this.baseHealthPool = this.getRandomNumber(10, 30);
+    this.healthPool = 0;
     this.catchPhrase = this.generateCatchPhrase();
   }
 
