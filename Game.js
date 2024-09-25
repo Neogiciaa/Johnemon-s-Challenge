@@ -56,7 +56,6 @@ function saveGameState() {
   }
 }
 
-// To be honest thanks GPT for this one ! I had logic but can't wrote it myself without brainfuck sad moment.
 function mergeGameState(existingSave, newState) {
   existingSave.JohnemonMaster.name = newState.JohnemonMaster.name || existingSave.JohnemonMaster.name;
   existingSave.JohnemonMaster.johnemonCollection = newState.JohnemonMaster.johnemonCollection.length > 0
@@ -159,40 +158,69 @@ function quitGame() {
   rl.close();
 }
 
-function fight() {
-  let ennemy = new Johnemon();
-}
+function showCollection(selectedIndex = null) {
+  if (selectedIndex !== null) {
+    const selectedJohnemon = player.johnemonCollection[selectedIndex];
 
-function showCollection() {
+    rl.question(`You selected ${selectedJohnemon.name}, what do you want to do then?\n1: Heal \n2: Revive \n3: Rename \n4: Release \n5: Return to menu\n`, (action) => {
+      readline.moveCursor(process.stdout, 0, -1);
+      readline.clearLine(process.stdout, 0);
+
+      switch (action) {
+        case '1':
+          const healResult = player.healJohnemon(selectedJohnemon);
+          console.log(healResult.message);
+          setTimeout(() => {
+            showCollection(selectedIndex);
+          }, 1000);
+          break;
+        case '2':
+          const reviveResult = player.reviveJohnemon(selectedJohnemon);
+          console.log(reviveResult.message);
+          if (reviveResult.success) {
+            showCollection(selectedIndex);
+          } else {
+            showCollection();
+          }
+          break;
+        case '3':
+          rl.question('Enter the new name: ', (newName) => {
+            player.renameJohnemon(selectedJohnemon, newName);
+            showCollection(selectedIndex);
+          });
+          break;
+        case '4':
+          player.releaseJohnemon(selectedJohnemon);
+          showCollection();
+          break;
+        case '5':
+          inGameMenu();
+          break;
+        default:
+          console.log('[System] Invalid option, returning to menu.');
+          showCollection();
+          break;
+      }
+    });
+    return;
+  }
+
   console.log("Here's your collection :");
-  player.johnemonCollection.forEach((johnemon) => {
-    console.log(`${johnemon.id}: Name: ${johnemon.name} - Level: ${johnemon.level} - Attack: ${johnemon.attackRange} - Defense: ${johnemon.defenseRange} - HP: ${johnemon.healthPool}`);
+  player.johnemonCollection.forEach((johnemon, index) => {
+    console.log(`${index + 1}: Name: ${johnemon.name} - Level: ${johnemon.level} - Attack: ${johnemon.attackRange} - Defense: ${johnemon.defenseRange} - HP: ${johnemon.healthPool}`);
+  });
 
-    rl.question('Select a johnemon to perform an action ? ', (answer) => {
-      let selectedJohnemon = player.johnemonCollection[answer -1];
-      rl.question(`You selected ${selectedJohnemon.name}, what do you want to do then ? \n1: Heal \n2: Revive \n3: Rename \n4: Release \n5: Return to menu  `, (answer) => {
-        switch (answer) {
-          case '1':
-            player.healJohnemon(selectedJohnemon);
-            break;
-          case '2':
-            player.reviveJohnemon(selectedJohnemon);
-            break;
-          case '3':
-            player.renameJohnemon(selectedJohnemon);
-            break;
-          case '4':
-            player.releaseJohnemon(selectedJohnemon);
-            break;
-          case '5':
-            inGameMenu();
-            break;
-        }
-      })
-    })
-  }, 1000);
+  rl.question('Select a Johnemon to perform an action (enter the number): ', (answer) => {
+    const index = parseInt(answer, 10) - 1;
+    if (isNaN(index) || index < 0 || index >= player.johnemonCollection.length) {
+      console.log('[System] Invalid selection, please try again.');
+      return showCollection();
+    }
 
+    showCollection(index); // Appelle la fonction avec l'index sélectionné
+  });
 }
+
 
 function inGameMenu() {
   rl.question("[System] What would you like to do next ?\n1: Continue exploration \n2: Collection \n3: Sleep \n4: Save game \n5: Return to main menu\n", (action) => {
@@ -206,7 +234,8 @@ function inGameMenu() {
         break;
       case '3': // sleep();
         break;
-      case '4': saveGameState();
+      case '4':
+        saveGameState();
         break;
       case '5':
         quitGame();
@@ -237,19 +266,32 @@ function proposeFirstJohnemon() {
   let secondJohnemon = johnemon.generateRandomName();
   let thirdJohnemon = johnemon.generateRandomName();
 
-  rl.question(`[Professor RaveChoux] Who will be your first lovely companion (${firstJohnemon} - ${secondJohnemon} - ${thirdJohnemon})? `, (answer) => {
+  rl.question(`[Professor RaveChoux] Who will be your first lovely companion ?\n1: ${firstJohnemon}\n2: ${secondJohnemon}\n3: ${thirdJohnemon} `, (answer) => {
     readline.moveCursor(process.stdout, 0, -1);
+    switch (answer) {
+      case '1':
+        answer = firstJohnemon;
+        break;
+      case '2':
+        answer = secondJohnemon;
+        break;
+      case '3':
+        answer = thirdJohnemon;
+        break;
+    }
     setTimeout(() => {
       console.log(`\n[Professor RaveChoux] Great choice, ${answer} is happy to be your new friend !`);
     }, 1000);
 
     player.johnemonCollection.push(answer);
     currentGameState.JohnemonMaster.johnemonCollection.push({
+      "id": player.johnemonCollection.length + 1,
       "name": answer,
       "level": 1,
       "attackRange": johnemon.attackRange,
       "defenseRange": johnemon.defenseRange,
-      "healthPool": johnemon.healthPool,
+      "baseHealthPool": johnemon.baseHealthPool,
+      "healthPool": johnemon.baseHealthPool,
       "catchPhrase": johnemon.catchPhrase
     });
     setTimeout(() => {
