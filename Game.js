@@ -217,7 +217,7 @@ function showCollection(selectedIndex = null) {
       return showCollection();
     }
 
-    showCollection(index); // Appelle la fonction avec l'index sélectionné
+    showCollection(index);
   });
 }
 
