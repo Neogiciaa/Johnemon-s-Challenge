@@ -31,6 +31,20 @@ let currentGameState = {
   }
 }
 
+function mergeGameState(existingSave, newState) {
+  existingSave.world.day = existingSave.world.day || newState.world.day;
+  existingSave.JohnemonMaster.currentMap = newState.JohnemonMaster.currentMap || existingSave.JohnemonMaster.currentMap;
+  existingSave.JohnemonMaster.name = newState.JohnemonMaster.name || existingSave.JohnemonMaster.name;
+  existingSave.JohnemonMaster.johnemonCollection = newState.JohnemonMaster.johnemonCollection.length > 0
+    ? newState.JohnemonMaster.johnemonCollection
+    : existingSave.JohnemonMaster.johnemonCollection;
+  existingSave.JohnemonMaster.healingItems = newState.JohnemonMaster.healingItems || existingSave.JohnemonMaster.healingItems;
+  existingSave.JohnemonMaster.reviveItems = newState.JohnemonMaster.reviveItems || existingSave.JohnemonMaster.reviveItems;
+  existingSave.JohnemonMaster.JOHNEBALLS = newState.JohnemonMaster.JOHNEBALLS || existingSave.JohnemonMaster.JOHNEBALLS;
+  existingSave.day = newState.day || existingSave.day;
+  existingSave.logs = newState.logs || existingSave.logs;
+}
+
 function saveGameState() {
   const saveFilePath = 'save.json';
 
@@ -61,18 +75,9 @@ function saveGameState() {
   }
 }
 
-function mergeGameState(existingSave, newState) {
-  existingSave.world.day = existingSave.world.day || newState.world.day;
-  existingSave.JohnemonMaster.currentMap = newState.JohnemonMaster.currentMap || existingSave.JohnemonMaster.currentMap;
-  existingSave.JohnemonMaster.name = newState.JohnemonMaster.name || existingSave.JohnemonMaster.name;
-  existingSave.JohnemonMaster.johnemonCollection = newState.JohnemonMaster.johnemonCollection.length > 0
-    ? newState.JohnemonMaster.johnemonCollection
-    : existingSave.JohnemonMaster.johnemonCollection;
-  existingSave.JohnemonMaster.healingItems = newState.JohnemonMaster.healingItems || existingSave.JohnemonMaster.healingItems;
-  existingSave.JohnemonMaster.reviveItems = newState.JohnemonMaster.reviveItems || existingSave.JohnemonMaster.reviveItems;
-  existingSave.JohnemonMaster.JOHNEBALLS = newState.JohnemonMaster.JOHNEBALLS || existingSave.JohnemonMaster.JOHNEBALLS;
-  existingSave.day = newState.day || existingSave.day;
-  existingSave.logs = newState.logs || existingSave.logs;
+function quitGame() {
+  console.log('\n[System] See you later !');
+  rl.close();
 }
 
 function easterEggAnswer(answer, tryLeft) {
@@ -81,7 +86,6 @@ function easterEggAnswer(answer, tryLeft) {
     console.log("[Professor RaveChoux] Well done !");
     console.log("[System] Congratulations, you earned a new success: QuizMaster !");
     player.success.push(`QuizMaster" - Unlocked at ${new Date().toLocaleString()}`);
-    console.log("Succes -> ", player.success);
     saveGameState();
     return;
   }
@@ -94,6 +98,20 @@ function easterEggAnswer(answer, tryLeft) {
 
   console.log("Oh dare you, come on! Nevermind, have a nice day.");
   saveGameState();
+}
+
+function askQuestion(tryLeft) {
+  rl.question("", (answer) => {
+    let parsedAnswer = parseInt(answer, 10);
+    tryLeft--;
+
+    if (![1, 2, 3].includes(parsedAnswer)) {
+      console.log("Please select a valid value (1 - 2 - 3).");
+      askQuestion(tryLeft);
+      return;
+    }
+    easterEggAnswer(parsedAnswer, tryLeft);
+  });
 }
 
 function easterEgg(tryLeft = 3) {
@@ -121,46 +139,6 @@ function easterEgg(tryLeft = 3) {
   } else {
     askQuestion(tryLeft);
   }
-}
-
-function askQuestion(tryLeft) {
-  rl.question("", (answer) => {
-    let parsedAnswer = parseInt(answer, 10);
-    tryLeft--;
-
-    if (![1, 2, 3].includes(parsedAnswer)) {
-      console.log("Please select a valid value (1 - 2 - 3).");
-      askQuestion(tryLeft);
-      return;
-    }
-    easterEggAnswer(parsedAnswer, tryLeft);
-  });
-}
-
-function mainMenu() {
-  rl.question('1: Load a game \n2: Create new game \n3: Quit game', (action) => {
-    readline.clearLine(process.stdout, 0);
-    switch (action) {
-      case '1':
-        loadGame();
-        break;
-      case '2':
-        newGame();
-        break;
-      case '3':
-        quitGame();
-        break;
-      default:
-        console.log('[System] Invalid option, please try again.');
-        mainMenu();
-        break;
-    }
-  });
-}
-
-function quitGame() {
-  console.log('\n[System] See you later !');
-  rl.close();
 }
 
 function showCollection(selectedIndex = null) {
@@ -236,52 +214,15 @@ function showCollection(selectedIndex = null) {
   });
 }
 
-function inGameMenu() {
-  rl.question("[System] What would you like to do next ?\n1: Continue exploration \n2: Collection \n3: Sleep \n4: Save game \n5: Return to main menu\n", (action) => {
-    readline.moveCursor(process.stdout, 0, -1);
-    readline.clearLine(process.stdout, 0);
-    switch (action) {
-      case '1': // fight(); OneDayPass ??
-        break;
-      case '2':
-        showCollection();
-        break;
-      case '3': // sleep();
-        break;
-      case '4':
-        saveGameState();
-        break;
-      case '5':
-        mainMenu();
-        break;
-      default:
-        console.log('[System] Invalid option, please try again.');
-        inGameMenu();
-        break;
-    }
-  });
-}
-
-function askForName() {
-  rl.question('[Professor RaveChoux] How should I call our future new arena champion? ', (answer) => {
-    player.name = answer;
-    currentGameState.JohnemonMaster.name = answer;
-    readline.moveCursor(process.stdout, 0, -1);
-    console.log(`\n[Professor RaveChoux] Great welcome in Johnemon's world, ${answer}.`);
-
-    setTimeout(() => {
-      proposeFirstJohnemon();
-    }, 2000);
-  });
-}
-
 function proposeFirstJohnemon() {
   let firstJohnemon = johnemon.generateRandomName();
   let secondJohnemon = johnemon.generateRandomName();
   let thirdJohnemon = johnemon.generateRandomName();
 
-  rl.question(`[Professor RaveChoux] Who will be your first lovely companion ?\n1: ${firstJohnemon}\n2: ${secondJohnemon}\n3: ${thirdJohnemon} \n`, (answer) => {
+  rl.question(`[Professor RaveChoux] Who will be your first lovely companion?\n1: ${firstJohnemon}\n2: ${secondJohnemon}\n3: ${thirdJohnemon}\n`, (answer) => {
+    readline.moveCursor(process.stdout, 0,-1);
     readline.clearLine(process.stdout, 0);
+    readline.moveCursor(process.stdout, 0,0);
     switch (answer) {
       case '1':
         answer = firstJohnemon;
@@ -302,6 +243,7 @@ function proposeFirstJohnemon() {
       "id": player.johnemonCollection.length + 1,
       "name": answer,
       "level": 1,
+      "maxLevel": johnemon.maxLevel,
       "attackRange": johnemon.attackRange,
       "defenseRange": johnemon.defenseRange,
       "baseHealthPool": johnemon.baseHealthPool,
@@ -327,6 +269,19 @@ function proposeFirstJohnemon() {
           }, 1000);
         }
       })
+    }, 2000);
+  });
+}
+
+function askForName() {
+  rl.question('[Professor RaveChoux] How should I call our future new arena champion? ', (answer) => {
+    player.name = answer;
+    currentGameState.JohnemonMaster.name = answer;
+    readline.moveCursor(process.stdout, 0, -1);
+    console.log(`\n[Professor RaveChoux] Great welcome in Johnemon's world, ${answer}.`);
+
+    setTimeout(() => {
+      proposeFirstJohnemon();
     }, 2000);
   });
 }
@@ -384,6 +339,55 @@ function loadGame() {
       newGame();
     }, 2000);
   }
+}
+
+function mainMenu() {
+  rl.question('1: Load a game \n2: Create new game \n3: Quit game\n', (action) => {
+    readline.moveCursor(process.stdout, 0,-1);
+    readline.clearLine(process.stdout, 0);
+    readline.moveCursor(process.stdout, 0,0);
+    switch (action) {
+      case '1':
+        loadGame();
+        break;
+      case '2':
+        newGame();
+        break;
+      case '3':
+        quitGame();
+        break;
+      default:
+        console.log('[System] Invalid option, please try again.');
+        mainMenu();
+        break;
+    }
+  });
+}
+
+function inGameMenu() {
+  rl.question("[System] What would you like to do next ?\n1: Continue exploration \n2: Collection \n3: Sleep \n4: Save game \n5: Return to main menu\n", (action) => {
+    readline.moveCursor(process.stdout, 0, -1);
+    readline.clearLine(process.stdout, 0);
+    switch (action) {
+      case '1': // fight(); OneDayPass ??
+        break;
+      case '2':
+        showCollection();
+        break;
+      case '3': // sleep();
+        break;
+      case '4':
+        saveGameState();
+        break;
+      case '5':
+        mainMenu();
+        break;
+      default:
+        console.log('[System] Invalid option, please try again.');
+        inGameMenu();
+        break;
+    }
+  });
 }
 
 function main() {
