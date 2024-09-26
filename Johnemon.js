@@ -57,6 +57,7 @@ class Johnemon {
     this.id = 0;
     this.name = this.generateRandomName();
     this.level = 1;
+    this.maxLevel = 100;
     this.experienceMeter = 0;
     this.attackRange = this.getRandomNumber(1, 8);
     this.defenseRange = this.getRandomNumber(1, 3);
