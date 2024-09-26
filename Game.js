@@ -2,6 +2,7 @@ const readline = require('readline');
 const JohnemonMaster = require('./JohnemonMaster');
 const Johnemon = require('./Johnemon');
 const JohnemonWorld = require('./JohnemonWorld');
+const JohnemonArena = require('./JohnemonArena');
 const fs = require('fs');
 
 const rl = readline.createInterface({
@@ -12,18 +13,22 @@ const rl = readline.createInterface({
 let johnemon = new Johnemon();
 let player = new JohnemonMaster();
 let world = new JohnemonWorld();
+let arena = new JohnemonArena();
 
 let currentGameState = {
   "saved_on": Date.now(),
+  "world": {
+    "maps": [],
+    "day": 1,
+  },
   "JohnemonMaster": {
     "name": "",
+    "currentMap": "",
     "johnemonCollection": [],
     "healingItems": 0,
     "reviveItems": 0,
     "JOHNEBALLS": 0
-  },
-  "day": 1,
-  "logs": []
+  }
 }
 
 function saveGameState() {
@@ -34,7 +39,7 @@ function saveGameState() {
 
     mergeGameState(existingSave, currentGameState);
     existingSave.saved_on = Date.now();
-    existingSave.logs.push(`Game saved on ${new Date(existingSave.saved_on).toLocaleString()}`);
+    existingSave.world.logs.push(`Game saved on ${new Date(existingSave.saved_on).toLocaleString()}`);
 
     fs.writeFile(saveFilePath, JSON.stringify(existingSave, null, 2), function (error) {
       if (error) {
@@ -57,6 +62,8 @@ function saveGameState() {
 }
 
 function mergeGameState(existingSave, newState) {
+  existingSave.world.day = existingSave.world.day || newState.world.day;
+  existingSave.JohnemonMaster.currentMap = newState.JohnemonMaster.currentMap || existingSave.JohnemonMaster.currentMap;
   existingSave.JohnemonMaster.name = newState.JohnemonMaster.name || existingSave.JohnemonMaster.name;
   existingSave.JohnemonMaster.johnemonCollection = newState.JohnemonMaster.johnemonCollection.length > 0
     ? newState.JohnemonMaster.johnemonCollection
@@ -65,7 +72,7 @@ function mergeGameState(existingSave, newState) {
   existingSave.JohnemonMaster.reviveItems = newState.JohnemonMaster.reviveItems || existingSave.JohnemonMaster.reviveItems;
   existingSave.JohnemonMaster.JOHNEBALLS = newState.JohnemonMaster.JOHNEBALLS || existingSave.JohnemonMaster.JOHNEBALLS;
   existingSave.day = newState.day || existingSave.day;
-  existingSave.logs = newState.logs.length > 0 ? newState.logs : existingSave.logs;
+  existingSave.logs = newState.logs || existingSave.logs;
 }
 
 function easterEggAnswer(answer, tryLeft) {
@@ -131,8 +138,7 @@ function askQuestion(tryLeft) {
 }
 
 function mainMenu() {
-  rl.question('', (action) => {
-    readline.moveCursor(process.stdout, 0, -1);
+  rl.question('1: Load a game \n2: Create new game \n3: Quit game', (action) => {
     readline.clearLine(process.stdout, 0);
     switch (action) {
       case '1':
@@ -142,8 +148,7 @@ function mainMenu() {
         newGame();
         break;
       case '3':
-        rl.close();
-        console.log('\n[System] See you later !');
+        quitGame();
         break;
       default:
         console.log('[System] Invalid option, please try again.');
@@ -159,6 +164,12 @@ function quitGame() {
 }
 
 function showCollection(selectedIndex = null) {
+  if (player.johnemonCollection === []) {
+    console.log("[System] Your collection is empty, catch new Johnemons to see and manage them.")
+    setTimeout(() => {
+      inGameMenu();
+    })
+  }
   if (selectedIndex !== null) {
     const selectedJohnemon = player.johnemonCollection[selectedIndex];
 
@@ -177,28 +188,32 @@ function showCollection(selectedIndex = null) {
         case '2':
           const reviveResult = player.reviveJohnemon(selectedJohnemon);
           console.log(reviveResult.message);
-          if (reviveResult.success) {
+          setTimeout(() => {
             showCollection(selectedIndex);
-          } else {
-            showCollection();
-          }
+          }, 1000);
           break;
         case '3':
           rl.question('Enter the new name: ', (newName) => {
             player.renameJohnemon(selectedJohnemon, newName);
-            showCollection(selectedIndex);
+            setTimeout(() => {
+              showCollection(selectedIndex);
+            })
           });
           break;
         case '4':
           player.releaseJohnemon(selectedJohnemon);
-          showCollection();
+          setTimeout(() => {
+            showCollection();
+          })
           break;
         case '5':
           inGameMenu();
           break;
         default:
           console.log('[System] Invalid option, returning to menu.');
-          showCollection();
+          setTimeout(() => {
+            showCollection();
+          })
           break;
       }
     });
@@ -221,7 +236,6 @@ function showCollection(selectedIndex = null) {
   });
 }
 
-
 function inGameMenu() {
   rl.question("[System] What would you like to do next ?\n1: Continue exploration \n2: Collection \n3: Sleep \n4: Save game \n5: Return to main menu\n", (action) => {
     readline.moveCursor(process.stdout, 0, -1);
@@ -238,7 +252,7 @@ function inGameMenu() {
         saveGameState();
         break;
       case '5':
-        quitGame();
+        mainMenu();
         break;
       default:
         console.log('[System] Invalid option, please try again.');
@@ -266,8 +280,8 @@ function proposeFirstJohnemon() {
   let secondJohnemon = johnemon.generateRandomName();
   let thirdJohnemon = johnemon.generateRandomName();
 
-  rl.question(`[Professor RaveChoux] Who will be your first lovely companion ?\n1: ${firstJohnemon}\n2: ${secondJohnemon}\n3: ${thirdJohnemon} `, (answer) => {
-    readline.moveCursor(process.stdout, 0, -1);
+  rl.question(`[Professor RaveChoux] Who will be your first lovely companion ?\n1: ${firstJohnemon}\n2: ${secondJohnemon}\n3: ${thirdJohnemon} \n`, (answer) => {
+    readline.clearLine(process.stdout, 0);
     switch (answer) {
       case '1':
         answer = firstJohnemon;
@@ -294,6 +308,7 @@ function proposeFirstJohnemon() {
       "healthPool": johnemon.baseHealthPool,
       "catchPhrase": johnemon.catchPhrase
     });
+    currentGameState.JohnemonMaster.currentMap = world.maps[0];
     setTimeout(() => {
       rl.question("[Professor RaveChoux] Just before we let you begin your wonderful adventure, how about trying your hand at a little cultivation challenge ?\nThis is only for fun and won't impact pour progression. (Yes - No) ", (answer) => {
         readline.moveCursor(process.stdout, 0, -1);
@@ -318,7 +333,7 @@ function proposeFirstJohnemon() {
 
 function newGame() {
   console.log("[System] Creating new game . . .\n");
-  console.log(`[System] Player ??? joined Pallet Town.`)
+  console.log(`[System] Player ??? joined ${ world.maps[0] } - Day ${ world.day }.`);
 
   setTimeout(() => {
     console.log("[Professor RaveChoux] Hello there! Glad to meet you !");
@@ -360,7 +375,7 @@ function loadGame() {
     player.johnemonCollection = savedGame.JohnemonMaster.johnemonCollection;
     setTimeout(() => {
       console.log(`[System] Game loaded successfully. Welcome back, ${player.name} !`);
-      console.log(`[System] Player ${player.name} joined Pallet Town.`) // @todo ref: world.currentMap
+      console.log(`[System] Player ${player.name} joined ${player.currentMap} - Day: ${world.day}`);
       inGameMenu();
     }, 2000);
   } else {

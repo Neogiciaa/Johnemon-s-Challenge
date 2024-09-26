@@ -6,6 +6,7 @@ class JohnemonMaster {
     this.reviveItems = 3;
     this.JOHNEBALLS = 10;
     this.success = [];
+    this.currentMap = "";
   }
 
   renameJohnemon(johnemon, newName) {

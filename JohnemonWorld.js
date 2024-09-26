@@ -1,10 +1,8 @@
 class JohnemonWorld {
   constructor() {
-    this.currentMap = {
-      name: "Pallet Town",
-      ennemies: [],
-    }
-    this.maps = [];
+    this.maps = ["Pallet Town"];
+    this.day = 1;
+    this.logs = [];
   }
 
   oneDayPasses(johnemon) {
