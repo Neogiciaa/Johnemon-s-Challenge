@@ -2,14 +2,7 @@
 
 ## Overview
 
-Welcome to the Johnemon™ Challenge! In this challenge, you will be creating a simplified version of the classic Pokémon game, running in the terminal. Your task is to define a JavaScript class called "Johnemon™" with specific attributes and behaviors.
-
-The Goal of this challenge is to provide you with a canvas for you to apply what we learned so far in the bootcamp.
-
-It will serves are a way for you to practice your skills and to show me what you can do.
-
-So, please go the extra mile and have fun!
-
+Project description
 
 ## Part one, The Johnemon™ class.
 In your coding adventures you will encounter many diferent JOHNEMON™S™. they will be your best friends and be able to fight for you!
@@ -33,9 +26,9 @@ A Johnemon™ has the following behaviors:
 - **Catch Phrase:**  A Johnemon™ can say its catch phrase.
 - **Evolve:** When the experience level of a Johnemon™ equals its current level times 100, it can evolve. This increases its level by 1 and increases its attack range, defense range, and health pool by a random number between 1 and 5.
 
-## Part Two, Become the ultimate Johnemon™ master!
+## Become the ultimate Johnemon™ master!
 
-### Class: Johnemon™Master
+### Johnemon™Master
 
 A Johnemon™Master is a person who has a collection of Johnemon™s. It has the following attributes:
 

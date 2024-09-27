@@ -62,8 +62,9 @@ class Johnemon {
     this.attackRange = this.getRandomNumber(1, 8);
     this.defenseRange = this.getRandomNumber(1, 3);
     this.baseHealthPool = this.getRandomNumber(10, 30);
-    this.healthPool = 0;
+    this.healthPool = this.baseHealthPool;
     this.catchPhrase = this.generateCatchPhrase();
+    this.alive = true;
   }
 
   generateRandomName() {
@@ -85,30 +86,24 @@ class Johnemon {
     const damage = this.getRandomNumber(this.attackRange * this.level, this.attackRange) - defender.defenseRange;
     defender.healthPool -= damage;
     console.log(`${this.name} attacked ${defender.name} and dealt ${damage} damage!`);
-  }
 
-  gainExperience(opponentLevel) {
-    const experienceGain = this.getRandomNumber(1, 5) * opponentLevel;
-    this.experienceMeter += experienceGain;
-    console.log(`${this.name} gained ${experienceGain} experience points!`);
-    if (this.experienceMeter >= this.level * 100) {
-      this.evolve();
+    if (defender.healthPool <= 0) {
+      defender.alive = false;
+      console.log(`${defender.name} is KO!`);
     }
   }
 
-  evolve() {
-    this.level += 1;
-    const attackIncrease = this.getRandomNumber(1, 5);
-    const defenseIncrease = this.getRandomNumber(1, 5);
-    const healthIncrease = this.getRandomNumber(1, 5);
-    this.attackRange += attackIncrease;
-    this.defenseRange += defenseIncrease;
-    this.healthPool += healthIncrease;
-    console.log(`${this.name} evolved into a higher level! New stats: Level ${this.level}, Attack Range ${this.attackRange}, Defense Range ${this.defenseRange}, Health Pool ${this.healthPool}`);
+  isAlive() {
+    return this.healthPool > 0;
   }
 
-  sayCatchPhrase() {
-    console.log(`${this.name} says: "${this.catchPhrase}"`);
+  gainExperience(exp) {
+    this.experienceMeter += exp;
+    if (this.experienceMeter >= this.level * 10) {
+      this.experienceMeter -= this.level * 10;
+      this.level++;
+      console.log(`${this.name} has leveled up! It is now level ${this.level}.`);
+    }
   }
 }
 

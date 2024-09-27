@@ -13,7 +13,6 @@ const rl = readline.createInterface({
 let johnemon = new Johnemon();
 let player = new JohnemonMaster();
 let world = new JohnemonWorld();
-let arena = new JohnemonArena();
 
 let currentGameState = {
   "saved_on": Date.now(),
@@ -31,19 +30,14 @@ let currentGameState = {
   }
 }
 
-function mergeGameState(existingSave, newState) {
-  existingSave.world.day = existingSave.world.day || newState.world.day;
-  existingSave.JohnemonMaster.currentMap = newState.JohnemonMaster.currentMap || existingSave.JohnemonMaster.currentMap;
-  existingSave.JohnemonMaster.name = newState.JohnemonMaster.name || existingSave.JohnemonMaster.name;
-  existingSave.JohnemonMaster.johnemonCollection = newState.JohnemonMaster.johnemonCollection.length > 0
-    ? newState.JohnemonMaster.johnemonCollection
-    : existingSave.JohnemonMaster.johnemonCollection;
-  existingSave.JohnemonMaster.healingItems = newState.JohnemonMaster.healingItems || existingSave.JohnemonMaster.healingItems;
-  existingSave.JohnemonMaster.reviveItems = newState.JohnemonMaster.reviveItems || existingSave.JohnemonMaster.reviveItems;
-  existingSave.JohnemonMaster.JOHNEBALLS = newState.JohnemonMaster.JOHNEBALLS || existingSave.JohnemonMaster.JOHNEBALLS;
-  existingSave.day = newState.day || existingSave.day;
-  existingSave.logs = newState.logs || existingSave.logs;
-}
+const mergeGameState = (existingSave, newState) => {
+  return {
+    ...existingSave,
+    ...newState,
+    world: {...existingSave.world, ...newState.world},
+    JohnemonMaster: {...existingSave.JohnemonMaster, ...newState.JohnemonMaster}
+  };
+};
 
 function saveGameState() {
   const saveFilePath = 'save.json';
@@ -51,11 +45,11 @@ function saveGameState() {
   if (fs.existsSync(saveFilePath)) {
     const existingSave = JSON.parse(fs.readFileSync(saveFilePath, 'utf8'));
 
-    mergeGameState(existingSave, currentGameState);
-    existingSave.saved_on = Date.now();
-    existingSave.world.logs.push(`Game saved on ${new Date(existingSave.saved_on).toLocaleString()}`);
+    const mergedSave = mergeGameState(existingSave, currentGameState);
+    mergedSave.saved_on = Date.now();
+    // mergedSave.world.logs.push(`Game saved on ${new Date(mergedSave.saved_on).toLocaleString()}`); Borken to fix
 
-    fs.writeFile(saveFilePath, JSON.stringify(existingSave, null, 2), function (error) {
+    fs.writeFile(saveFilePath, JSON.stringify(mergedSave, null, 2), function (error) {
       if (error) {
         console.error(error.message);
       } else {
@@ -126,7 +120,7 @@ function easterEgg(tryLeft = 3) {
 
     setTimeout(() => {
       console.log("Here's three choices:");
-      console.log("1: Lord of the Rings.\n2: Harry Potter\n3: Narnia");
+      console.log("1: Lord of the Rings\n2: Harry Potter\n3: Narnia");
     }, 3500);
 
     setTimeout(() => {
@@ -142,11 +136,11 @@ function easterEgg(tryLeft = 3) {
 }
 
 function showCollection(selectedIndex = null) {
-  if (player.johnemonCollection === []) {
+  if (player.johnemonCollection.length === 0) {
     console.log("[System] Your collection is empty, catch new Johnemons to see and manage them.")
     setTimeout(() => {
       inGameMenu();
-    })
+    },1000);
   }
   if (selectedIndex !== null) {
     const selectedJohnemon = player.johnemonCollection[selectedIndex];
@@ -175,14 +169,17 @@ function showCollection(selectedIndex = null) {
             player.renameJohnemon(selectedJohnemon, newName);
             setTimeout(() => {
               showCollection(selectedIndex);
-            })
+            }, 1000);
           });
           break;
         case '4':
-          player.releaseJohnemon(selectedJohnemon);
+          let release = player.releaseJohnemon(selectedJohnemon);
+          console.log(release.message);
           setTimeout(() => {
-            showCollection();
-          })
+            if (player.johnemonCollection.length === 0) {
+              inGameMenu();
+            } else showCollection();
+          },1000);
           break;
         case '5':
           inGameMenu();
@@ -191,7 +188,7 @@ function showCollection(selectedIndex = null) {
           console.log('[System] Invalid option, returning to menu.');
           setTimeout(() => {
             showCollection();
-          })
+          },1000);
           break;
       }
     });
@@ -215,80 +212,87 @@ function showCollection(selectedIndex = null) {
 }
 
 function proposeFirstJohnemon() {
-  let firstJohnemon = johnemon.generateRandomName();
-  let secondJohnemon = johnemon.generateRandomName();
-  let thirdJohnemon = johnemon.generateRandomName();
+  const firstJohnemon = johnemon.generateRandomName();
+  const secondJohnemon = johnemon.generateRandomName();
+  const thirdJohnemon = johnemon.generateRandomName();
 
   rl.question(`[Professor RaveChoux] Who will be your first lovely companion?\n1: ${firstJohnemon}\n2: ${secondJohnemon}\n3: ${thirdJohnemon}\n`, (answer) => {
-    readline.moveCursor(process.stdout, 0,-1);
+    readline.moveCursor(process.stdout, 0, -1);
     readline.clearLine(process.stdout, 0);
-    readline.moveCursor(process.stdout, 0,0);
+    readline.moveCursor(process.stdout, 0, 0);
+
+    let chosenJohnemon;
     switch (answer) {
       case '1':
-        answer = firstJohnemon;
+        chosenJohnemon = new Johnemon(firstJohnemon, 1, 100, 10, 5, 30); // Crée un objet Johnemon avec des stats par défaut ou des stats personnalisées
         break;
       case '2':
-        answer = secondJohnemon;
+        chosenJohnemon = new Johnemon(secondJohnemon, 1, 100, 10, 5, 30);
         break;
       case '3':
-        answer = thirdJohnemon;
+        chosenJohnemon = new Johnemon(thirdJohnemon, 1, 100, 10, 5, 30);
         break;
+      default:
+        console.log("[System] Invalid option.");
+        return proposeFirstJohnemon();
     }
+
     setTimeout(() => {
-      console.log(`\n[Professor RaveChoux] Great choice, ${answer} is happy to be your new friend !`);
+      console.log(`\n[Professor RaveChoux] Great choice, ${chosenJohnemon.name} is happy to be your new friend !`);
     }, 1000);
 
-    player.johnemonCollection.push(answer);
+    player.johnemonCollection.push(chosenJohnemon);
     currentGameState.JohnemonMaster.johnemonCollection.push({
-      "id": player.johnemonCollection.length + 1,
-      "name": answer,
-      "level": 1,
-      "maxLevel": johnemon.maxLevel,
-      "attackRange": johnemon.attackRange,
-      "defenseRange": johnemon.defenseRange,
-      "baseHealthPool": johnemon.baseHealthPool,
-      "healthPool": johnemon.baseHealthPool,
-      "catchPhrase": johnemon.catchPhrase
+      id: player.johnemonCollection.length, // Utilise l'index actuel + 1 comme identifiant
+      name: chosenJohnemon.name,
+      level: chosenJohnemon.level,
+      maxLevel: chosenJohnemon.maxLevel,
+      attackRange: chosenJohnemon.attackRange,
+      defenseRange: chosenJohnemon.defenseRange,
+      baseHealthPool: chosenJohnemon.baseHealthPool,
+      healthPool: chosenJohnemon.healthPool,
+      catchPhrase: chosenJohnemon.catchPhrase
     });
+
     currentGameState.JohnemonMaster.currentMap = world.maps[0];
+
     setTimeout(() => {
-      rl.question("[Professor RaveChoux] Just before we let you begin your wonderful adventure, how about trying your hand at a little cultivation challenge ?\nThis is only for fun and won't impact pour progression. (Yes - No) ", (answer) => {
+      rl.question("[Professor RaveChoux] Just before we let you begin your wonderful adventure, how about trying your hand at a little cultivation challenge ?\nThis is only for fun and won't impact your progression. (Yes - No) ", (answer) => {
         readline.moveCursor(process.stdout, 0, -1);
         readline.clearLine(process.stdout, 0);
-        if (answer === 'Yes' || answer === 'yes' || answer === 'y' || answer === 'Y') {
-          console.log("[Professor RaveChoux] Yeah, i see that im facing a real gamer !");
+        if (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y') {
+          console.log("[Professor RaveChoux] Yeah, I see that I'm facing a real gamer !");
           easterEgg();
-        }
-
-        if (answer === 'No' || answer === 'no' || answer === 'n' || answer === 'N') {
+        } else {
           setTimeout(() => {
-            console.log(`[Professor RaveChoux] Alright, no problem ! Have a nice day ${player.name}`);
+            console.log(`[Professor RaveChoux] Alright, no problem! Have a nice day ${player.name}`);
             setTimeout(() => {
               saveGameState();
-            })
+            }, 1000);
           }, 1000);
         }
-      })
+      });
     }, 2000);
   });
 }
 
 function askForName() {
   rl.question('[Professor RaveChoux] How should I call our future new arena champion? ', (answer) => {
+    if (!answer.trim()) {
+      console.log("[System] Invalid name. Please enter a valid name.");
+      return askForName(); // Demander à nouveau le nom
+    }
     player.name = answer;
     currentGameState.JohnemonMaster.name = answer;
     readline.moveCursor(process.stdout, 0, -1);
     console.log(`\n[Professor RaveChoux] Great welcome in Johnemon's world, ${answer}.`);
-
-    setTimeout(() => {
-      proposeFirstJohnemon();
-    }, 2000);
+    proposeFirstJohnemon();
   });
 }
 
 function newGame() {
   console.log("[System] Creating new game . . .\n");
-  console.log(`[System] Player ??? joined ${ world.maps[0] } - Day ${ world.day }.`);
+  console.log(`[System] Player ??? joined ${world.getCurrentMapName()} - Day ${world.day}.`);
 
   setTimeout(() => {
     console.log("[Professor RaveChoux] Hello there! Glad to meet you !");
@@ -343,9 +347,9 @@ function loadGame() {
 
 function mainMenu() {
   rl.question('1: Load a game \n2: Create new game \n3: Quit game\n', (action) => {
-    readline.moveCursor(process.stdout, 0,-1);
+    readline.moveCursor(process.stdout, 0, -1);
     readline.clearLine(process.stdout, 0);
-    readline.moveCursor(process.stdout, 0,0);
+    readline.moveCursor(process.stdout, 0, 0);
     switch (action) {
       case '1':
         loadGame();
@@ -364,34 +368,81 @@ function mainMenu() {
   });
 }
 
-function inGameMenu() {
-  rl.question("[System] What would you like to do next ?\n1: Continue exploration \n2: Collection \n3: Sleep \n4: Save game \n5: Return to main menu\n", (action) => {
-    readline.moveCursor(process.stdout, 0, -1);
-    readline.clearLine(process.stdout, 0);
-    switch (action) {
-      case '1': // fight(); OneDayPass ??
-        break;
-      case '2':
-        showCollection();
-        break;
-      case '3': // sleep();
-        break;
-      case '4':
-        saveGameState();
-        break;
-      case '5':
-        mainMenu();
-        break;
-      default:
-        console.log('[System] Invalid option, please try again.');
-        inGameMenu();
-        break;
-    }
-  });
-}
+// Not done yet !
+// function continueExploration() {
+//   const alivePlayerJohnemons = player.johnemonCollection.filter(johnemon => johnemon.isAlive());
+//   const aliveEnemyJohnemon = world.findAliveEnemy();
+//
+//   console.log("Ennemi trouvé en vie : ", aliveEnemyJohnemon);
+//
+//   if (alivePlayerJohnemons.length === 0) {
+//     console.log("[System] No more alive johnemons, revive one or sleep to fight again.");
+//     inGameMenu();
+//     return;
+//   }
+//
+//   if (!aliveEnemyJohnemon) {
+//     console.log(`[System] All enemies in ${player.currentMap} are down, congratulations !\nMooving to next map ${world.maps[1].name}`); // Créer 2 ième map
+//     player.moveToNextMap();
+//     return;
+//   }
+//
+//   if (alivePlayerJohnemons.length === 1) {
+//     const selectedJohnemon = alivePlayerJohnemons[0];
+//     let arena = new JohnemonArena(selectedJohnemon, aliveEnemyJohnemon);
+//     arena.startBattle();
+//     return;
+//   }
+//
+//   console.log("[System] Here's your available johnemons:");
+//   alivePlayerJohnemons.forEach((johnemon, index) => {
+//     console.log(`${index + 1}: ${johnemon.name} (HP: ${johnemon.healthPool})`);
+//   });
+//
+//   rl.question(`Which one do you want to use: `, (selectedIndex) => {
+//     const selectedIndexNumber = parseInt(selectedIndex, 10) - 1;
+//
+//     if (selectedIndexNumber >= 0 && selectedIndexNumber < alivePlayerJohnemons.length) {
+//       const selectedJohnemon = alivePlayerJohnemons[selectedIndexNumber];
+//       console.log(`[System] You choose ${selectedJohnemon.name} to fight.`);
+//       let arena = new JohnemonArena(selectedJohnemon, aliveEnemyJohnemon);
+//       arena.startBattle();
+//     } else {
+//       console.log("[System] Invalid selection, please try again.");
+//       continueExploration();
+//     }
+//   });
+// }
 
-function main() {
-  loadGame();
-}
+  function inGameMenu() {
+    rl.question("[System] What would you like to do next ?\n1: Continue exploration \n2: Collection \n3: Sleep \n4: Save game \n5: Return to main menu\n", (action) => {
+      readline.moveCursor(process.stdout, 0, -1);
+      readline.clearLine(process.stdout, 0);
+      switch (action) {
+        case '1':
+          inGameMenu(); // Replace with -> continueExploration();
+          break;
+        case '2':
+          showCollection();
+          break;
+        case '3': // sleep();
+          break;
+        case '4':
+          saveGameState();
+          break;
+        case '5':
+          mainMenu();
+          break;
+        default:
+          console.log('[System] Invalid option, please try again.');
+          inGameMenu();
+          break;
+      }
+    });
+  }
 
-main();
+  function main() {
+    loadGame();
+  }
+
+  main();

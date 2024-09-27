@@ -52,6 +52,17 @@ class JohnemonMaster {
       return { success: false, message: "[System] Johnemon not found in your collection." };
     }
   }
+
+  moveToNextMap(world) {
+    const currentMapIndex = world.maps.findIndex(map => map.id === this.currentMap.id);
+    if (currentMapIndex + 1 < world.maps.length) {
+      this.currentMap = world.maps[currentMapIndex + 1];
+      console.log(`[System] You've moved to the next map: ${this.currentMap.name}`);
+    } else {
+      console.log('[System] You have completed all available maps!');
+    }
+  }
+
 }
 
 module.exports = JohnemonMaster;

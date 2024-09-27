@@ -2,26 +2,36 @@ Day 3 --
 
 ## Todo
 - Refacto menu d'actions sur Johnemons dans la collection (Rename & release) Done
-- Créer une fonction de log messages.
-- Déplacer la logique de showCollection dans JohnemonMaster.
-
-## Debug
-- Quand je crées une new partie, le premier Pokémon n'est pas accessible dans la collection, je dois relancer le jeu.
 
 ## Refacto
 - Changer mon système de naming de pokemon éclatax atm. Done
 - Modifier ma sélection de premier pokémon. Done
 - Fonctions pour gérer un pokémon (rename - soin - revive - release). Done
-- Créer une fonction de parseInt.
-- setTimeOut partout beurk.
 
 Day 4 --
+
 ## Todo
 - Terminer la gestion de maps et modifier ligne 162 de Game.js pour rendre dynamique la map actuelle du joueur. Done
 - Fonctions de combat.
+- Créer une fonction de parseInt.
+- setTimeOut partout beurk.
 
 ## Timesheet
 3h30 Coaching
 3h Code
 30min tech talk
 
+## Day 5 --
+
+## Todo
+Delete la ligne avec le chiffre de sélection du 1er poke - Done
+QuitGame saut de ligne + delete log - Done
+Faire les methodes de combat ! Prio
+Créer une fonction de log messages.
+Déplacer la logique de showCollection dans JohnemonMaster.
+
+## Debug
+Quand je crées une new partie, le premier Pokémon n'est pas accessible dans la collection, je dois relancer le jeu.
+
+
+!! Demander D&Q si je peux présenter TIO après Jira pour l'orga de projets et l'estimation des temps pour accomplir une tâche spécifique ? !!
