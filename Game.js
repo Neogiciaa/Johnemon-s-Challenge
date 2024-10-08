@@ -80,7 +80,7 @@ async function proposeFirstJohnemon() {
     setTimeout(() => {
       console.log(`\n[Professor RaveChoux] Great choice, ${chosenJohnemon.name} is happy to be your new friend !`);
     }, 1000);
-
+    chosenJohnemon.save();
     player.addJohnemonToCollection(chosenJohnemon.id);
 
     // setTimeout(() => {
