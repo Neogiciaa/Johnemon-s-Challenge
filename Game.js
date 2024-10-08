@@ -1,9 +1,9 @@
-const readline = require('readline');
-const JohnemonMaster = require('./JohnemonMaster');
-const Johnemon = require('./Johnemon');
-const JohnemonWorld = require('./JohnemonWorld');
-const JohnemonArena = require('./JohnemonArena');
-const fs = require('fs');
+import readline from "node:readline";
+import connection from "./dbConfig.js";
+import JohnemonMaster from "./JohnemonMaster";
+import Johnemon from "./Johnemon";
+import JohnemonWorld from "./JohnemonWorld";
+import JohnemonArena from "./JohnemonArena";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -25,7 +25,7 @@ function easterEggAnswer(answer, tryLeft) {
     console.log("[Professor RaveChoux] Well done !");
     console.log("[System] Congratulations, you earned a new success: QuizMaster !");
     player.success.push(`QuizMaster" - Unlocked at ${new Date().toLocaleString()}`);
-    saveGameState();
+    // saveGameState();
     return;
   }
 
@@ -169,7 +169,7 @@ function proposeFirstJohnemon() {
     let chosenJohnemon;
     switch (answer) {
       case '1':
-        chosenJohnemon = new Johnemon(firstJohnemon, 1, 100, 10, 5, 30); // Crée un objet Johnemon avec des stats par défaut ou des stats personnalisées
+        chosenJohnemon = new Johnemon(firstJohnemon, 1, 100, 10, 5, 30);
         break;
       case '2':
         chosenJohnemon = new Johnemon(secondJohnemon, 1, 100, 10, 5, 30);
@@ -186,20 +186,20 @@ function proposeFirstJohnemon() {
       console.log(`\n[Professor RaveChoux] Great choice, ${chosenJohnemon.name} is happy to be your new friend !`);
     }, 1000);
 
-    player.johnemonCollection.push(chosenJohnemon);
-    currentGameState.JohnemonMaster.johnemonCollection.push({
-      id: player.johnemonCollection.length, // Utilise l'index actuel + 1 comme identifiant
-      name: chosenJohnemon.name,
-      level: chosenJohnemon.level,
-      maxLevel: chosenJohnemon.maxLevel,
-      attackRange: chosenJohnemon.attackRange,
-      defenseRange: chosenJohnemon.defenseRange,
-      baseHealthPool: chosenJohnemon.baseHealthPool,
-      healthPool: chosenJohnemon.healthPool,
-      catchPhrase: chosenJohnemon.catchPhrase
-    });
+    // player.johnemonCollection.push(chosenJohnemon);
+    // currentGameState.JohnemonMaster.johnemonCollection.push({
+    //   id: player.johnemonCollection.length,
+    //   name: chosenJohnemon.name,
+    //   level: chosenJohnemon.level,
+    //   maxLevel: chosenJohnemon.maxLevel,
+    //   attackRange: chosenJohnemon.attackRange,
+    //   defenseRange: chosenJohnemon.defenseRange,
+    //   baseHealthPool: chosenJohnemon.baseHealthPool,
+    //   healthPool: chosenJohnemon.healthPool,
+    //   catchPhrase: chosenJohnemon.catchPhrase
+    // });
 
-    currentGameState.JohnemonMaster.currentMap = world.maps[0];
+    // currentGameState.JohnemonMaster.currentMap = world.maps[0];
 
     setTimeout(() => {
       rl.question("[Professor RaveChoux] Just before we let you begin your wonderful adventure, how about trying your hand at a little cultivation challenge ?\nThis is only for fun and won't impact your progression. (Yes - No) ", (answer) => {
@@ -212,7 +212,7 @@ function proposeFirstJohnemon() {
           setTimeout(() => {
             console.log(`[Professor RaveChoux] Alright, no problem! Have a nice day ${player.name}`);
             setTimeout(() => {
-              saveGameState();
+              // saveGameState();
             }, 1000);
           }, 1000);
         }
@@ -228,7 +228,7 @@ function askForName() {
       return askForName();
     }
     player.name = answer;
-    currentGameState.JohnemonMaster.name = answer;
+    // currentGameState.JohnemonMaster.name = answer;
     readline.moveCursor(process.stdout, 0, -1);
     console.log(`\n[Professor RaveChoux] Great welcome in Johnemon's world, ${answer}.`);
     proposeFirstJohnemon();
@@ -242,10 +242,10 @@ function mainMenu() {
     readline.moveCursor(process.stdout, 0, 0);
     switch (action) {
       case '1':
-        loadGame();
+        // loadGame();
         break;
       case '2':
-        newGame();
+        // newGame();
         break;
       case '3':
         quitGame();
@@ -258,7 +258,7 @@ function mainMenu() {
   });
 }
 
-  function inGameMenu() {
+function inGameMenu() {
     rl.question("[System] What would you like to do next ?\n1: Continue exploration \n2: Collection \n3: Sleep \n4: Save game \n5: Return to main menu\n", (action) => {
       readline.moveCursor(process.stdout, 0, -1);
       readline.clearLine(process.stdout, 0);
@@ -285,8 +285,8 @@ function mainMenu() {
     });
   }
 
-  function main() {
+function main() {
     loadGame();
   }
 
-  main();
+main();
