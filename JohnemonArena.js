@@ -53,4 +53,4 @@ class JohnemonArena {
   }
 }
 
-module.exports = JohnemonArena
+export default JohnemonArena;
