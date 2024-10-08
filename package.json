@@ -1,6 +1,7 @@
 {
   "name": "johnemon",
   "version": "0.0.1",
+  "type": "module",
   "description": "This is an exercise to manipulate all notions viewed in previous ones.",
   "main": "Game.js",
   "scripts": {
