@@ -1,4 +1,4 @@
-const connection = require("./dbConfig.js");
+import connection from "./dbConfig.js";
 
 class JohnemonMaster {
   constructor(name) {
