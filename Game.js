@@ -14,61 +14,6 @@ let johnemon = new Johnemon();
 let player = new JohnemonMaster();
 let world = new JohnemonWorld();
 
-let currentGameState = {
-  "saved_on": Date.now(),
-  "world": {
-    "maps": [],
-    "day": 1,
-  },
-  "JohnemonMaster": {
-    "name": "",
-    "currentMap": "",
-    "johnemonCollection": [],
-    "healingItems": 0,
-    "reviveItems": 0,
-    "JOHNEBALLS": 0
-  }
-}
-
-const mergeGameState = (existingSave, newState) => {
-  return {
-    ...existingSave,
-    ...newState,
-    world: {...existingSave.world, ...newState.world},
-    JohnemonMaster: {...existingSave.JohnemonMaster, ...newState.JohnemonMaster}
-  };
-};
-
-function saveGameState() {
-  const saveFilePath = 'save.json';
-
-  if (fs.existsSync(saveFilePath)) {
-    const existingSave = JSON.parse(fs.readFileSync(saveFilePath, 'utf8'));
-
-    const mergedSave = mergeGameState(existingSave, currentGameState);
-    mergedSave.saved_on = Date.now();
-    // mergedSave.world.logs.push(`Game saved on ${new Date(mergedSave.saved_on).toLocaleString()}`); Borken to fix
-
-    fs.writeFile(saveFilePath, JSON.stringify(mergedSave, null, 2), function (error) {
-      if (error) {
-        console.error(error.message);
-      } else {
-        console.log("[System] Game updated successfully.");
-        inGameMenu();
-      }
-    });
-  } else {
-    fs.writeFile(saveFilePath, JSON.stringify(currentGameState, null, 2), function (error) {
-      if (error) {
-        console.error(error.message);
-      } else {
-        console.log("[System] Game saved successfully.");
-        inGameMenu();
-      }
-    });
-  }
-}
-
 function quitGame() {
   console.log('\n[System] See you later !');
   rl.close();
@@ -280,7 +225,7 @@ function askForName() {
   rl.question('[Professor RaveChoux] How should I call our future new arena champion? ', (answer) => {
     if (!answer.trim()) {
       console.log("[System] Invalid name. Please enter a valid name.");
-      return askForName(); // Demander à nouveau le nom
+      return askForName();
     }
     player.name = answer;
     currentGameState.JohnemonMaster.name = answer;
@@ -288,61 +233,6 @@ function askForName() {
     console.log(`\n[Professor RaveChoux] Great welcome in Johnemon's world, ${answer}.`);
     proposeFirstJohnemon();
   });
-}
-
-function newGame() {
-  console.log("[System] Creating new game . . .\n");
-  console.log(`[System] Player ??? joined ${world.getCurrentMapName()} - Day ${world.day}.`);
-
-  setTimeout(() => {
-    console.log("[Professor RaveChoux] Hello there! Glad to meet you !");
-  }, 2000);
-
-  setTimeout(() => {
-    console.log("[Professor RaveChoux] Welcome to the world of Johnemon! My name is Professor RaveChoux.");
-  }, 4000);
-
-  setTimeout(() => {
-    console.log("[Professor RaveChoux] This world is inhabited far and wide by creatures called Johnemon.");
-  }, 6000);
-
-  setTimeout(() => {
-    console.log("[Professor RaveChoux] For some people, Johnemon are pets. Others use them for battles.");
-  }, 8000);
-
-  setTimeout(() => {
-    console.log("[Professor RaveChoux] As for myself... I study Johnemon as a profession.");
-  }, 10000);
-
-  setTimeout(() => {
-    console.log("[Professor RaveChoux] But enough about me, I'd like to know more about you.");
-  }, 12000);
-
-  setTimeout(() => {
-    askForName();
-  }, 14000);
-}
-
-function loadGame() {
-  const saveFilePath = 'save.json';
-
-  if (fs.existsSync(saveFilePath)) {
-    console.log("[System] Loading existing game...");
-    const savedGame = JSON.parse(fs.readFileSync(saveFilePath, 'utf8'));
-    mergeGameState(currentGameState, savedGame);
-    player.name = savedGame.JohnemonMaster.name;
-    player.johnemonCollection = savedGame.JohnemonMaster.johnemonCollection;
-    setTimeout(() => {
-      console.log(`[System] Game loaded successfully. Welcome back, ${player.name} !`);
-      console.log(`[System] Player ${player.name} joined ${player.currentMap} - Day: ${world.day}`);
-      inGameMenu();
-    }, 2000);
-  } else {
-    console.log("[System] No previous game found, let's begin a new adventure !");
-    setTimeout(() => {
-      newGame();
-    }, 2000);
-  }
 }
 
 function mainMenu() {
@@ -367,52 +257,6 @@ function mainMenu() {
     }
   });
 }
-
-// Not done yet !
-// function continueExploration() {
-//   const alivePlayerJohnemons = player.johnemonCollection.filter(johnemon => johnemon.isAlive());
-//   const aliveEnemyJohnemon = world.findAliveEnemy();
-//
-//   console.log("Ennemi trouvé en vie : ", aliveEnemyJohnemon);
-//
-//   if (alivePlayerJohnemons.length === 0) {
-//     console.log("[System] No more alive johnemons, revive one or sleep to fight again.");
-//     inGameMenu();
-//     return;
-//   }
-//
-//   if (!aliveEnemyJohnemon) {
-//     console.log(`[System] All enemies in ${player.currentMap} are down, congratulations !\nMooving to next map ${world.maps[1].name}`); // Créer 2 ième map
-//     player.moveToNextMap();
-//     return;
-//   }
-//
-//   if (alivePlayerJohnemons.length === 1) {
-//     const selectedJohnemon = alivePlayerJohnemons[0];
-//     let arena = new JohnemonArena(selectedJohnemon, aliveEnemyJohnemon);
-//     arena.startBattle();
-//     return;
-//   }
-//
-//   console.log("[System] Here's your available johnemons:");
-//   alivePlayerJohnemons.forEach((johnemon, index) => {
-//     console.log(`${index + 1}: ${johnemon.name} (HP: ${johnemon.healthPool})`);
-//   });
-//
-//   rl.question(`Which one do you want to use: `, (selectedIndex) => {
-//     const selectedIndexNumber = parseInt(selectedIndex, 10) - 1;
-//
-//     if (selectedIndexNumber >= 0 && selectedIndexNumber < alivePlayerJohnemons.length) {
-//       const selectedJohnemon = alivePlayerJohnemons[selectedIndexNumber];
-//       console.log(`[System] You choose ${selectedJohnemon.name} to fight.`);
-//       let arena = new JohnemonArena(selectedJohnemon, aliveEnemyJohnemon);
-//       arena.startBattle();
-//     } else {
-//       console.log("[System] Invalid selection, please try again.");
-//       continueExploration();
-//     }
-//   });
-// }
 
   function inGameMenu() {
     rl.question("[System] What would you like to do next ?\n1: Continue exploration \n2: Collection \n3: Sleep \n4: Save game \n5: Return to main menu\n", (action) => {
