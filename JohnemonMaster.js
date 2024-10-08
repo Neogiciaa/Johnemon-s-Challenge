@@ -1,32 +1,48 @@
+const connection = require("./dbConfig.js");
+
 class JohnemonMaster {
   constructor(name) {
+    this.id = 0;
     this.name = name;
     this.johnemonCollection = [];
     this.healingItems = 5;
     this.reviveItems = 3;
-    this.JOHNEBALLS = 10;
+    this.johneballs = 10;
     this.success = [];
-    this.currentMap = "";
+  }
+
+  async addJohnemonToCollection(JohnemonId) {
+    try {
+      await connection.query(`
+          INSERT INTO JohnemonMaster_Johnemon (JohnemonMasterId, JohnemonId)
+          VALUES (?, ?)
+      `, [this.id, JohnemonId]);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   renameJohnemon(johnemon, newName) {
     let previousName = johnemon.name;
     johnemon.name = newName;
-    return { success: true, message: `[System] ${previousName} has been renamed to ${newName}.` };
+    return {success: true, message: `[System] ${previousName} has been renamed to ${newName}.`};
   }
 
   healJohnemon(johnemon) {
     if (this.healingItems <= 0) {
-      return { success: false, message: '[System] No healing items left.' };
+      return {success: false, message: '[System] No healing items left.'};
     }
 
     if (johnemon.healthPool === johnemon.baseHealthPool) {
-      return { success: false, message: `[System] ${johnemon.name} is already at full health.` };
+      return {success: false, message: `[System] ${johnemon.name} is already at full health.`};
     }
 
     johnemon.healthPool = Math.min(johnemon.healthPool + 20, johnemon.baseHealthPool);
     this.healingItems--;
-    return { success: true, message: `[System] ${johnemon.name} has been healed. HP: ${johnemon.healthPool}/${johnemon.baseHealthPool}. Remaining healing items: ${ this.healingItems }` };
+    return {
+      success: true,
+      message: `[System] ${johnemon.name} has been healed. HP: ${johnemon.healthPool}/${johnemon.baseHealthPool}. Remaining healing items: ${this.healingItems}`
+    };
   }
 
   reviveJohnemon(johnemon) {
@@ -34,12 +50,18 @@ class JohnemonMaster {
       if (johnemon.healthPool <= 0) {
         johnemon.healthPool = johnemon.baseHealthPool;
         this.reviveItems--;
-        return { "success": true, "message": `[System] ${johnemon.name} has been revived with ${johnemon.healthPool} HP. Remaining revive items: ${ this.reviveItems }`}
+        return {
+          "success": true,
+          "message": `[System] ${johnemon.name} has been revived with ${johnemon.healthPool} HP. Remaining revive items: ${this.reviveItems}`
+        }
       } else {
-        return { "success": false, "message": `[System] ${johnemon.name} is still alive !`}
+        return {"success": false, "message": `[System] ${johnemon.name} is still alive !`}
       }
     } else {
-      return { success: false, message: "[System] No more revive item left. Buy some to the store or drop some with fights or sleep to revive all of your johnemon's"}
+      return {
+        success: false,
+        message: "[System] No more revive item left. Buy some to the store or drop some with fights or sleep to revive all of your johnemon's"
+      }
     }
   }
 
@@ -47,22 +69,35 @@ class JohnemonMaster {
     const index = this.johnemonCollection.indexOf(johnemon);
     if (index !== -1) {
       this.johnemonCollection.splice(index, 1);
-      return { success: true, message: `[System] ${johnemon.name} has been released from your collection. `};
+      return {success: true, message: `[System] ${johnemon.name} has been released from your collection. `};
     } else {
-      return { success: false, message: "[System] Johnemon not found in your collection." };
+      return {success: false, message: "[System] Johnemon not found in your collection."};
     }
   }
 
-  moveToNextMap(world) {
-    const currentMapIndex = world.maps.findIndex(map => map.id === this.currentMap.id);
-    if (currentMapIndex + 1 < world.maps.length) {
-      this.currentMap = world.maps[currentMapIndex + 1];
-      console.log(`[System] You've moved to the next map: ${this.currentMap.name}`);
-    } else {
-      console.log('[System] You have completed all available maps!');
+  async save() {
+    try {
+      const [result] = await connection.query(`
+          INSERT INTO JohnemonMaster (name, healingItems, reviveItems, johneballs)
+          VALUES (?, ?, ?, ?)
+      `, [this.name, this.healingItems, this.reviveItems, this.johneballs]);
+      this.id = result.insertId;
+    } catch (error) {
+      console.log(error);
     }
   }
 
+  async addSuccess(content) {
+    try {
+      await connection.query(`
+          INSERT INTO Success (content, JohnemonMasterId)
+          VALUES (?, ?)
+      `, [content, this.id]);
+      console.log("Success successfully added");
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
 
 module.exports = JohnemonMaster;
