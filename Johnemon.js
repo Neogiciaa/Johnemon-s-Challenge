@@ -1,3 +1,5 @@
+import connection from "./dbConfig.js";
+
 const firstStudentsPart = [
   'Oli',
   'No',
@@ -104,6 +106,15 @@ class Johnemon {
       this.level++;
       console.log(`${this.name} has leveled up! It is now level ${this.level}.`);
     }
+  }
+
+  async save() {
+    const [result] = await connection.query(`
+        INSERT INTO Johnemon (name, level, maxLevel, experienceMeter, attackRange, defenseRange, baseHealthPool,
+                              healthPool, catchPhrase, alive)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [this.name, this.level, this.maxLevel, this.experienceMeter, this.attackRange, this.defenseRange, this.baseHealthPool, this.healthPool, this.catchPhrase, this.alive]);
+    this.id = result.insertId ;
   }
 }
 
