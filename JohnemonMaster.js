@@ -100,4 +100,4 @@ class JohnemonMaster {
   }
 }
 
-module.exports = JohnemonMaster;
+export default JohnemonMaster;
