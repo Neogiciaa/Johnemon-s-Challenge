@@ -4,13 +4,15 @@ import JohnemonWorld from "./JohnemonWorld.js";
 import JohnemonMaster from "./JohnemonMaster.js";
 import Johnemon from "./Johnemon.js";
 import JohnemonArena from "./JohnemonArena.js";
+import Success from "./Success.js";
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
 
-let player = new JohnemonMaster("Default");
+let player = new JohnemonMaster();
+let success = new Success();
 
 async function checkExistingSaves() {
   const [result] = await connection.query(`SELECT * FROM World`);
@@ -51,12 +53,11 @@ async function askForName() {
 }
 
 async function proposeFirstJohnemon() {
-  const johnemon = new Johnemon();
-  const firstJohnemon = johnemon.generateRandomName();
-  const secondJohnemon = johnemon.generateRandomName();
-  const thirdJohnemon = johnemon.generateRandomName();
+  const firstJohnemon = new Johnemon();
+  const secondJohnemon = new Johnemon();
+  const thirdJohnemon = new Johnemon();
 
-  rl.question(`[Professor RaveChoux] Who will be your first lovely companion?\n1: ${firstJohnemon}\n2: ${secondJohnemon}\n3: ${thirdJohnemon}\n`, (answer) => {
+  rl.question(`[Professor RaveChoux] Who will be your first lovely companion?\n1: ${firstJohnemon.name}\n2: ${secondJohnemon.name}\n3: ${thirdJohnemon.name}\n`, async (answer) => {
     readline.moveCursor(process.stdout, 0, -1);
     readline.clearLine(process.stdout, 0);
     readline.moveCursor(process.stdout, 0, 0);
@@ -64,13 +65,13 @@ async function proposeFirstJohnemon() {
     let chosenJohnemon;
     switch (answer) {
       case '1':
-        chosenJohnemon = new Johnemon(firstJohnemon);
+        chosenJohnemon = firstJohnemon;
         break;
       case '2':
-        chosenJohnemon = new Johnemon(secondJohnemon);
+        chosenJohnemon = secondJohnemon;
         break;
       case '3':
-        chosenJohnemon = new Johnemon(thirdJohnemon);
+        chosenJohnemon = thirdJohnemon;
         break;
       default:
         console.log("[System] Invalid option.");
@@ -80,26 +81,27 @@ async function proposeFirstJohnemon() {
     setTimeout(() => {
       console.log(`\n[Professor RaveChoux] Great choice, ${chosenJohnemon.name} is happy to be your new friend !`);
     }, 1000);
-    chosenJohnemon.save();
-    player.addJohnemonToCollection(chosenJohnemon.id);
 
-    // setTimeout(() => {
-    //   rl.question("[Professor RaveChoux] Just before we let you begin your wonderful adventure, how about trying your hand at a little cultivation challenge ?\nThis is only for fun and won't impact your progression. (Yes - No) ", (answer) => {
-    //     readline.moveCursor(process.stdout, 0, -1);
-    //     readline.clearLine(process.stdout, 0);
-    //     if (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y') {
-    //       console.log("[Professor RaveChoux] Yeah, I see that I'm facing a real gamer !");
-    //       easterEgg();
-    //     } else {
-    //       setTimeout(() => {
-    //         console.log(`[Professor RaveChoux] Alright, no problem! Have a nice day ${player.name}`);
-    //         setTimeout(() => {
-    //           // saveGameState();
-    //         }, 1000);
-    //       }, 1000);
-    //     }
-    //   });
-    // }, 2000);
+    await chosenJohnemon.save(undefined, undefined, undefined, undefined, undefined, undefined, undefined,undefined, player.id);
+    await player.addJohnemonToCollection(chosenJohnemon.id);
+
+    setTimeout(() => {
+      rl.question("[Professor RaveChoux] Just before we let you begin your wonderful adventure, how about trying your hand at a little cultivation challenge ?\nThis is only for fun and won't impact your progression. (Yes - No) ", (answer) => {
+        readline.moveCursor(process.stdout, 0, -1);
+        readline.clearLine(process.stdout, 0);
+        if (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y') {
+          console.log("[Professor RaveChoux] Yeah, I see that I'm facing a real gamer !");
+          easterEgg();
+        } else {
+          setTimeout(() => {
+            console.log(`[Professor RaveChoux] Alright, no problem! Have a nice day ${player.name}`);
+            setTimeout(() => {
+              inGameMenu();
+            }, 1000);
+          }, 1000);
+        }
+      });
+    }, 2000);
   });
 }
 
@@ -110,66 +112,66 @@ function quitGame() {
 
 }
 
-// function easterEggAnswer(answer, tryLeft) {
-//   let parsedAnswer = parseInt(answer, 10);
-//   if (parsedAnswer === 2) {
-//     console.log("[Professor RaveChoux] Well done !");
-//     console.log("[System] Congratulations, you earned a new success: QuizMaster !");
-//     player.success.push(`QuizMaster" - Unlocked at ${new Date().toLocaleString()}`);
-//     // saveGameState();
-//     return;
-//   }
-//
-//   if (tryLeft > 0) {
-//     console.log(`Nice try but no! ${tryLeft} more try left.`);
-//     askQuestion(tryLeft);
-//     return;
-//   }
-//
-//   console.log("Oh dare you, come on! Nevermind, have a nice day.");
-//   saveGameState();
-// }
+async function easterEggAnswer(answer, tryLeft) {
+  let parsedAnswer = parseInt(answer, 10);
+  if (parsedAnswer === 2) {
+    console.log("[Professor RaveChoux] Well done !");
+    console.log("[System] Congratulations, you earned a new success: QuizMaster !");
 
-// function askQuestion(tryLeft) {
-//   rl.question("", (answer) => {
-//     let parsedAnswer = parseInt(answer, 10);
-//     tryLeft--;
-//
-//     if (![1, 2, 3].includes(parsedAnswer)) {
-//       console.log("Please select a valid value (1 - 2 - 3).");
-//       askQuestion(tryLeft);
-//       return;
-//     }
-//     easterEggAnswer(parsedAnswer, tryLeft);
-//   });
-// }
+    await success.save("Quiz Master", player.id);
+    await inGameMenu();
+  }
 
-// function easterEgg(tryLeft = 3) {
-//   if (tryLeft === 3) {
-//     setTimeout(() => {
-//       console.log("[Professor RaveChoux] As I told you earlier, I'm Professor RaveChoux !");
-//     }, 1000);
-//
-//     setTimeout(() => {
-//       console.log("[Professor RaveChoux] Would you be able to find where it's inspired from?");
-//     }, 2500);
-//
-//     setTimeout(() => {
-//       console.log("Here's three choices:");
-//       console.log("1: Lord of the Rings\n2: Harry Potter\n3: Narnia");
-//     }, 3500);
-//
-//     setTimeout(() => {
-//       console.log("[Professor RaveChoux] Any idea ? Press your choice to see if you're right and don't worry you have three chances, how kind am i right ?");
-//     }, 4500)
-//
-//     setTimeout(() => {
-//       askQuestion(tryLeft);
-//     }, 5500);
-//   } else {
-//     askQuestion(tryLeft);
-//   }
-// }
+  if (tryLeft > 0) {
+    console.log(`Nice try but no! ${tryLeft} more try left.`);
+    askQuestion(tryLeft);
+    return;
+  }
+
+  console.log("Oh dare you, come on! Nevermind, have a nice day.");
+  await inGameMenu();
+}
+
+function askQuestion(tryLeft) {
+  rl.question("", (answer) => {
+    let parsedAnswer = parseInt(answer, 10);
+    tryLeft--;
+
+    if (![1, 2, 3].includes(parsedAnswer)) {
+      console.log("Please select a valid value (1 - 2 - 3).");
+      askQuestion(tryLeft);
+      return;
+    }
+    easterEggAnswer(parsedAnswer, tryLeft);
+  });
+}
+
+function easterEgg(tryLeft = 3) {
+  if (tryLeft === 3) {
+    setTimeout(() => {
+      console.log("[Professor RaveChoux] As I told you earlier, I'm Professor RaveChoux !");
+    }, 1000);
+
+    setTimeout(() => {
+      console.log("[Professor RaveChoux] Would you be able to find where it's inspired from?");
+    }, 2500);
+
+    setTimeout(() => {
+      console.log("Here's three choices:");
+      console.log("1: Lord of the Rings\n2: Harry Potter\n3: Narnia");
+    }, 3500);
+
+    setTimeout(() => {
+      console.log("[Professor RaveChoux] Any idea ? Press your choice to see if you're right and don't worry you have three chances, how kind am i right ?");
+    }, 4500)
+
+    setTimeout(() => {
+      askQuestion(tryLeft);
+    }, 5500);
+  } else {
+    askQuestion(tryLeft);
+  }
+}
 
 // function showCollection(selectedIndex = null) {
 //   if (player.johnemonCollection.length === 0) {
@@ -247,7 +249,12 @@ function quitGame() {
 //   });
 // }
 
+async function saveGameState() {
+  // TODO !!
+}
+
 function mainMenu() {
+  console.log("Welcome to Johnemon's world !");
   rl.question('1: Load a game \n2: Create new game \n3: Quit game\n', async (action) => {
     readline.moveCursor(process.stdout, 0, -1);
     readline.clearLine(process.stdout, 0);
@@ -270,32 +277,32 @@ function mainMenu() {
   });
 }
 
-// function inGameMenu() {
-//     rl.question("[System] What would you like to do next ?\n1: Continue exploration \n2: Collection \n3: Sleep \n4: Save game \n5: Return to main menu\n", (action) => {
-//       readline.moveCursor(process.stdout, 0, -1);
-//       readline.clearLine(process.stdout, 0);
-//       switch (action) {
-//         case '1':
-//           inGameMenu(); // Replace with -> continueExploration();
-//           break;
-//         case '2':
-//           showCollection();
-//           break;
-//         case '3': // sleep();
-//           break;
-//         case '4':
-//           saveGameState();
-//           break;
-//         case '5':
-//           mainMenu();
-//           break;
-//         default:
-//           console.log('[System] Invalid option, please try again.');
-//           inGameMenu();
-//           break;
-//       }
-//     });
-//   }
+async function inGameMenu() {
+    rl.question("[System] What would you like to do next ?\n1: Continue exploration \n2: Collection \n3: Sleep \n4: Save game \n5: Return to main menu\n", async (action) => {
+      readline.moveCursor(process.stdout, 0, -1);
+      readline.clearLine(process.stdout, 0);
+      switch (action) {
+        case '1':
+          // Replace with -> continueExploration();
+          break;
+        case '2':
+          // showCollection();
+          break;
+        case '3': // sleep();
+          break;
+        case '4':
+          await saveGameState();
+          break;
+        case '5':
+          mainMenu();
+          break;
+        default:
+          console.log('[System] Invalid option, please try again.');
+          await inGameMenu();
+          break;
+      }
+    });
+  }
 
 async function main() {
   await checkExistingSaves();
