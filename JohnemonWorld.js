@@ -1,6 +1,6 @@
 import connection from "./dbConfig.js";
 
-class JohnemonWorld {
+export default class JohnemonWorld {
   constructor() {
     this.id = 0;
     this.day = 1;
@@ -15,13 +15,17 @@ class JohnemonWorld {
 
   }
 
-  async save() {
-    const [result] = await connection.query(`
-    INSERT INTO World (day)
-    VALUES (?, ?)`, [this.day, this.JohnemonMasterId]);
-    this.id = result.insertId ;
-    console.log("World datas successfully saved.");
+  async save(day, JohnemonMasterId) {
+    this.day = day ?? this.day;
+    this.JohnemonMasterId = JohnemonMasterId ?? this.JohnemonMasterId;
+
+    try {
+      const [result] = await connection.query(`
+          INSERT INTO World (day)
+          VALUES (?, ?)`, [this.day]);
+      this.id = result.insertId;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
-
-export default JohnemonWorld;
