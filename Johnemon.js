@@ -65,6 +65,7 @@ class Johnemon {
     this.defenseRange = this.getRandomNumber(1, 3);
     this.baseHealthPool = this.getRandomNumber(10, 30);
     this.healthPool = this.baseHealthPool;
+    this.johnemonMasterId = 0;
     this.catchPhrase = this.generateCatchPhrase();
     this.alive = true;
   }
@@ -108,13 +109,30 @@ class Johnemon {
     }
   }
 
-  async save() {
-    const [result] = await connection.query(`
+  async save(name, level, maxLevel, experienceMeter, attackRange, defenseRange, baseHealthPool,
+             healthPool, johnemonMasterId, catchPhrase, alive) {
+    try {
+      this.name = name ?? this.name;
+      this.level = level ?? this.level;
+      this.maxLevel = maxLevel ?? this.maxLevel;
+      this.experienceMeter = experienceMeter ?? this.experienceMeter;
+      this.attackRange = attackRange ?? this.attackRange;
+      this.defenseRange = defenseRange ?? this.defenseRange;
+      this.baseHealthPool = baseHealthPool ?? this.baseHealthPool;
+      this.healthPool = healthPool ?? this.healthPool;
+      this.johnemonMasterId = johnemonMasterId ?? this.johnemonMasterId;
+      this.catchPhrase = catchPhrase ?? this.catchPhrase;
+      this.alive = alive ?? this.alive;
+
+      const [result] = await connection.query(`
         INSERT INTO Johnemon (name, level, maxLevel, experienceMeter, attackRange, defenseRange, baseHealthPool,
-                              healthPool, catchPhrase, alive)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [this.name, this.level, this.maxLevel, this.experienceMeter, this.attackRange, this.defenseRange, this.baseHealthPool, this.healthPool, this.catchPhrase, this.alive]);
-    this.id = result.insertId ;
+                              healthPool, johnemonMasterId, catchPhrase, alive)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [this.name, this.level, this.maxLevel, this.experienceMeter, this.attackRange, this.defenseRange, this.baseHealthPool, this.healthPool, this.johnemonMasterId, this.catchPhrase, this.alive]);
+      this.id = result.insertId ;
+    } catch (error) {
+      console.log(error)
+    }
   }
 }
 
