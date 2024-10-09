@@ -1,9 +1,9 @@
 import connection from "./dbConfig.js";
 
 class JohnemonMaster {
-  constructor(name) {
+  constructor() {
     this.id = 0;
-    this.name = name;
+    this.name = "Default";
     this.johnemonCollection = [];
     this.healingItems = 5;
     this.reviveItems = 3;
@@ -75,8 +75,13 @@ class JohnemonMaster {
     }
   }
 
-  async save() {
+  async save(name, healingItems, reviveItems, johneballs) {
     try {
+      this.name = name ?? this.name;
+      this.healingItems = healingItems ?? this.healingItems;
+      this.reviveItems = reviveItems ?? this.reviveItems;
+      this.johneballs = johneballs ?? this.johneballs;
+
       const [result] = await connection.query(`
           INSERT INTO JohnemonMaster (name, healingItems, reviveItems, johneballs)
           VALUES (?, ?, ?, ?)
